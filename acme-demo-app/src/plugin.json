@@ -4,6 +4,13 @@
   "name": "Demo",
   "id": "acme-demo-app",
   "backend": true,
+  "alerting": true,
+  "streaming": true,
+  "autoEnabled": true,
+  "metrics": true,
+  "annotations": true,
+  "category": "iot",
+  "preload": true,
   "executable": "gpx_demo",
   "info": {
     "keywords": ["app"],

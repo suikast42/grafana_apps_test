@@ -8,6 +8,9 @@ export const testIds = {
   pageOne: {
     container: 'data-testid pg-one-container',
     navigateToFour: 'data-testid navigate-to-four',
+    health: 'data-testid pg-one-health',
+    ping: 'data-testid pg-one-ping',
+    echo: 'data-testid pg-one-ping',
   },
   pageTwo: {
     container: 'data-testid pg-two-container',

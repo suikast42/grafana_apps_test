@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, {  } from 'react';
 
-import { SceneApp, SceneAppPage } from '@grafana/scenes';
+import {SceneApp, SceneAppPage, useSceneApp} from '@grafana/scenes';
 import { getBasicScene } from './scenes';
 import { prefixRoute } from '../../utils/utils.routing';
 import { DATASOURCE_REF, ROUTES } from '../../constants';
@@ -24,7 +24,7 @@ const getScene = () => {
 };
 
 const HomePage = () => {
-  const scene = useMemo(() => getScene(), []);
+  const scene = useSceneApp(getScene);
 
   return (
     <>

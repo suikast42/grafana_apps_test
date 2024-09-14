@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, {  } from 'react';
 import { prefixRoute } from '../../utils/utils.routing';
 import { DATASOURCE_REF, ROUTES } from '../../constants';
 import {
@@ -9,7 +9,7 @@ import {
   SceneFlexLayout,
   SceneQueryRunner,
   SceneTimePicker,
-  SceneTimeRange,
+  SceneTimeRange, useSceneApp,
 } from '@grafana/scenes';
 import { getHumidityOverviewScene, getTemperatureOverviewScene } from './scenes';
 import { getRoomsTemperatureStats, getRoomsTemperatureTable } from './panels';
@@ -94,8 +94,7 @@ const getDrilldownsAppScene = () => {
 };
 
 const WithDrilldown = () => {
-  const scene = useMemo(() => getDrilldownsAppScene(), []);
-
+  const scene = useSceneApp(getDrilldownsAppScene);
   return <scene.Component model={scene} />;
 };
 

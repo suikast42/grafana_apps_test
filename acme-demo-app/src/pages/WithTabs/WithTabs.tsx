@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { SceneApp, SceneAppPage } from '@grafana/scenes';
+import React, {  } from 'react';
+import {SceneApp, SceneAppPage, useSceneApp} from '@grafana/scenes';
 import { ROUTES } from '../../constants';
 import { prefixRoute } from '../../utils/utils.routing';
 import { getBasicScene } from '../Home/scenes';
@@ -39,8 +39,7 @@ const getScene = () =>
   });
 
 const PageWithTabs = () => {
-  const scene = useMemo(() => getScene(), []);
-
+  const scene = useSceneApp(getScene);
   return <scene.Component model={scene} />;
 };
 

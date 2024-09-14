@@ -1,12 +1,16 @@
-import React, {useMemo} from 'react';
-import {getHellloWorldScene} from './helloWorldScene';
-import {SceneApp, SceneAppPage} from "@grafana/scenes";
+import React, {  } from 'react';
+
+import {
+    SceneApp,
+    SceneAppPage,
+    useSceneApp
+} from "@grafana/scenes";
 import {prefixRoute} from "../../utils/utils.routing";
 import {ROUTES} from "../../constants";
+import {getHelloWorldScene} from "./helloWorldScene";
 
 const HelloWorld = () => {
-    // const scene = getScene();
-    const scene = useMemo(() => getScene(), []);
+    const scene = useSceneApp(getScene);
     return <scene.Component model={scene}/>;
 };
 
@@ -16,13 +20,14 @@ const getScene = () =>
     new SceneApp({
         pages: [
             new SceneAppPage({
-                title: 'Page with tabs',
-                subTitle: 'This scene showcases a basic tabs functionality.',
+                title: 'Simple Hello World',
+                subTitle: 'Simple Hello world page.',
                 // Important: Mind the page route is ambiguous for the tabs to work properly
                 url: prefixRoute(`${ROUTES.HelloWorld}`),
                 hideFromBreadcrumbs: true,
-                getScene: getHellloWorldScene,
-
+                getScene: getHelloWorldScene,
             }),
         ],
     });
+
+

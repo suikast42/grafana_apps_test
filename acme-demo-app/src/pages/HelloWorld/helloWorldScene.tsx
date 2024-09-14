@@ -1,15 +1,16 @@
-import { EmbeddedScene, SceneFlexLayout, SceneFlexItem, PanelBuilders } from '@grafana/scenes';
+import {EmbeddedScene, SceneFlexLayout} from '@grafana/scenes';
+import {getHelloWordComponentScene} from "./components/HelloWorldState";
 
-export function getHellloWorldScene() {
+
+export function getHelloWorldScene() {
   return new EmbeddedScene({
     body: new SceneFlexLayout({
       children: [
-        new SceneFlexItem({
-          width: '100%',
-          height: 300,
-          body: PanelBuilders.text().setTitle('Hello world panel').setOption('content', 'Hello world!').build(),
-        }),
+        // getCounterScene(),
+        getHelloWordComponentScene(),
       ],
     }),
   });
 }
+
+
