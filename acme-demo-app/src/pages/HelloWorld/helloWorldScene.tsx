@@ -1,6 +1,6 @@
 import { EmbeddedScene, SceneFlexLayout, SceneFlexItem, PanelBuilders } from '@grafana/scenes';
 
-export function getScene() {
+export function getHellloWorldScene() {
   return new EmbeddedScene({
     body: new SceneFlexLayout({
       children: [
