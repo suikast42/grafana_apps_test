@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/grafana/grafana-plugin-sdk-go/backend/datasource"
 	"os"
 
-	"github.com/grafana/grafana-plugin-sdk-go/backend/app"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/acme/demo/pkg/plugin"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 )
 
 func main() {
@@ -16,7 +16,8 @@ func main() {
 	// argument. This factory will be automatically called on incoming request
 	// from Grafana to create different instances of `App` (per plugin
 	// ID).
-	if err := app.Manage("acme-demo-app", plugin.NewApp, app.ManageOpts{}); err != nil {
+	log.DefaultLogger.Info("Loading acme-demods-datasource")
+	if err := datasource.Manage("acme-demods-datasource", plugin.NewDatasource, datasource.ManageOpts{}); err != nil {
 		log.DefaultLogger.Error(err.Error())
 		os.Exit(1)
 	}

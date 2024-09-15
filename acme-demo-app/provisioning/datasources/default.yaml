@@ -4,3 +4,15 @@ datasources:
   - name: gdev-testdata
     isDefault: false
     type: testdata
+
+  - name: 'demods'
+    type: 'acme-demods-datasource'
+    access: proxy
+    isDefault: false
+    orgId: 1
+    version: 1
+    editable: true
+    jsonData:
+      path: '/resources'
+    secureJsonData:
+      apiKey: 'api-key'

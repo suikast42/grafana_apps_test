@@ -20,6 +20,7 @@ services:
     cap_add:
       - SYS_PTRACE
     volumes:
+      - ./provisioning/custom.ini:/etc/grafana/grafana.ini
       - ./dist:/var/lib/grafana/plugins/acme-demo-app
       - ./provisioning:/etc/grafana/provisioning
       - .:/root/acme-demo-app

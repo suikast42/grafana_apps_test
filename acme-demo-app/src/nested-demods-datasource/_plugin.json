@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
+  "type": "datasource",
+  "name": "Demods",
+  "id": "acme-demods-datasource",
+  "metrics": true,
+  "backend": true,
+  "alerting": true,
+  "streaming": true,
+  "tracing": true,
+  "executable": "gpx_demo",
+  "info": {
+    "description": "",
+    "author": {
+      "name": "Acme"
+    },
+    "keywords": ["datasource"],
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "links": [],
+    "screenshots": [],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=10.4.0",
+    "plugins": []
+  }
+}
