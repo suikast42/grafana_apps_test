@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/acme/demo/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
+	"math"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -83,7 +84,7 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 	// add fields.
 	frame.Fields = append(frame.Fields,
 		data.NewField("time", nil, []time.Time{query.TimeRange.From, query.TimeRange.To}),
-		data.NewField("values", nil, []int64{10, 20}),
+		data.NewField("values", nil, []int64{1, 200}),
 	)
 
 	// add the frames to the response.
@@ -136,6 +137,59 @@ func (d *Datasource) PublishStream(context.Context, *backend.PublishStreamReques
 
 func (d *Datasource) RunStream(ctx context.Context, req *backend.RunStreamRequest, sender *backend.StreamSender) error {
 	log.DefaultLogger.Debug("DemoDs RunStream", req.Path, req.Data, ctx)
-	err := sender.SendBytes([]byte("Hello"))
-	return err
+
+	//s := rand.NewSource(time.Now().UnixNano())
+	//r := rand.New(s)
+	ticker := time.NewTicker(time.Duration(1) * time.Second)
+	defer ticker.Stop()
+
+	//for {
+	//	select {
+	//	case <-ctx.Done():
+	//		return ctx.Err()
+	//	case <-ticker.C:
+	//		// we generate a random value using the intervals provided by the frontend
+	//		randomValue := r.Float64() * (500)
+	//
+	//		err := sender.SendFrame(
+	//			data.NewFrame(
+	//				"response",
+	//				data.NewField("time", nil, []time.Time{time.Now()}),
+	//				data.NewField("value", nil, []float64{randomValue})),
+	//			data.IncludeAll,
+	//		)
+	//
+	//		if err != nil {
+	//			log.DefaultLogger.Error("Failed send frame", "error", err)
+	//		}
+	//	}
+	//}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ticker.C:
+			// We generate a sinusoidal value with a period of 2π (360 degrees)
+			// `r` is assumed to be the current time or phase in the sine wave
+			currentTime := time.Now().UnixNano() // Get current time in nanoseconds
+			period := float64(10)                // Set the period for the sine wave
+			amplitude := 500.0                   // Set the amplitude for the sine wave
+
+			// Calculate the sine wave value
+			sinusoidalValue := amplitude * math.Sin(float64(currentTime)*2*math.Pi/period)
+
+			err := sender.SendFrame(
+				data.NewFrame(
+					"response",
+					data.NewField("time", nil, []time.Time{time.Now()}),
+					data.NewField("value", nil, []float64{sinusoidalValue})),
+				data.IncludeAll,
+			)
+
+			if err != nil {
+				log.DefaultLogger.Error("Failed to send frame", "error", err)
+			}
+		}
+	}
 }
