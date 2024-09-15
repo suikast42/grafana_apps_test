@@ -140,7 +140,7 @@ func (d *Datasource) RunStream(ctx context.Context, req *backend.RunStreamReques
 
 	//s := rand.NewSource(time.Now().UnixNano())
 	//r := rand.New(s)
-	ticker := time.NewTicker(time.Duration(1) * time.Second)
+	ticker := time.NewTicker(time.Duration(250) * time.Millisecond)
 	defer ticker.Stop()
 
 	//for {
@@ -164,7 +164,7 @@ func (d *Datasource) RunStream(ctx context.Context, req *backend.RunStreamReques
 	//		}
 	//	}
 	//}
-
+	var degree float64 = 0
 	for {
 		select {
 		case <-ctx.Done():
@@ -172,13 +172,14 @@ func (d *Datasource) RunStream(ctx context.Context, req *backend.RunStreamReques
 		case <-ticker.C:
 			// We generate a sinusoidal value with a period of 2π (360 degrees)
 			// `r` is assumed to be the current time or phase in the sine wave
-			currentTime := time.Now().UnixNano() // Get current time in nanoseconds
-			period := float64(10)                // Set the period for the sine wave
-			amplitude := 500.0                   // Set the amplitude for the sine wave
 
+			amplitude := 1.0 // Set the amplitude for the sine wave
 			// Calculate the sine wave value
-			sinusoidalValue := amplitude * math.Sin(float64(currentTime)*2*math.Pi/period)
-
+			sinusoidalValue := amplitude * math.Sin(degree*(math.Pi/180))
+			degree += 22.5
+			if degree >= 360 {
+				degree = 0
+			}
 			err := sender.SendFrame(
 				data.NewFrame(
 					"response",
