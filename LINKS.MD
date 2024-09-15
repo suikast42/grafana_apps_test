@@ -10,4 +10,4 @@
 
 [Work with nested plugins](https://grafana.com/developers/plugin-tools/how-to-guides/app-plugins/work-with-nested-plugins)
 
-
+[build-a-streaming-data-source-plugin](https://grafana.com/developers/plugin-tools/tutorials/build-a-streaming-data-source-plugin)

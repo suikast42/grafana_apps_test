@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/acme/demo/pkg/models"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -21,6 +22,7 @@ var (
 	_ backend.QueryDataHandler      = (*Datasource)(nil)
 	_ backend.CheckHealthHandler    = (*Datasource)(nil)
 	_ instancemgmt.InstanceDisposer = (*Datasource)(nil)
+	_ backend.StreamHandler         = (*Datasource)(nil) // Streaming data source needs to implement this
 )
 
 // NewDatasource creates a new datasource instance.
@@ -61,7 +63,8 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 
 type queryModel struct{}
 
-func (d *Datasource) query(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
+func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
+	log.DefaultLogger.Debug("DemoDs query", query.JSON, query.TimeRange, ctx, pCtx)
 	var response backend.DataResponse
 
 	// Unmarshal the JSON into our queryModel.
@@ -113,4 +116,26 @@ func (d *Datasource) CheckHealth(_ context.Context, req *backend.CheckHealthRequ
 		Status:  backend.HealthStatusOk,
 		Message: "Data source is working",
 	}, nil
+}
+
+// SubscribeStream just returns an ok in this case, since we will always allow the user to successfully connect.
+// Permissions verifications could be done here. Check backend.StreamHandler docs for more details.
+func (d *Datasource) SubscribeStream(_ context.Context, req *backend.SubscribeStreamRequest) (*backend.SubscribeStreamResponse, error) {
+	return &backend.SubscribeStreamResponse{
+		Status: backend.SubscribeStreamStatusOK,
+	}, nil
+}
+
+// PublishStream just returns permission denied in this case, since in this example we don't want the user to send stream data.
+// Permissions verifications could be done here. Check backend.StreamHandler docs for more details.
+func (d *Datasource) PublishStream(context.Context, *backend.PublishStreamRequest) (*backend.PublishStreamResponse, error) {
+	return &backend.PublishStreamResponse{
+		Status: backend.PublishStreamStatusPermissionDenied,
+	}, nil
+}
+
+func (d *Datasource) RunStream(ctx context.Context, req *backend.RunStreamRequest, sender *backend.StreamSender) error {
+	log.DefaultLogger.Debug("DemoDs RunStream", req.Path, req.Data, ctx)
+	err := sender.SendBytes([]byte("Hello"))
+	return err
 }
