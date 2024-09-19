@@ -2,7 +2,10 @@ module github.com/acme/demo
 
 go 1.21
 
-require github.com/grafana/grafana-plugin-sdk-go v0.248.0
+require (
+	github.com/grafana/grafana-plugin-sdk-go v0.250.0
+	github.com/magefile/mage v1.15.0
+)
 
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
@@ -40,7 +43,6 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
-	github.com/magefile/mage v1.15.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattetti/filebuffer v1.0.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
