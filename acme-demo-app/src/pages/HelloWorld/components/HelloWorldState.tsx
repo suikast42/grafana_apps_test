@@ -5,7 +5,7 @@ import {
     SceneObjectState
 } from "@grafana/scenes";
 import React from "react";
-import {Badge, Stack} from "@grafana/ui";
+import {Badge, Button, Stack} from "@grafana/ui";
 import {getBackendSrv} from "@grafana/runtime";
 import {PLUGIN_API_BASE_URL} from "../../../constants";
 
@@ -27,6 +27,7 @@ export class HelloWordComponent extends SceneObjectBase<HelloWorldState> {
         this.setState({
             content: result,
         });
+
     };
 }
 
@@ -35,7 +36,7 @@ function HelloWorldRenderer({model}: SceneComponentProps<HelloWordComponent>) {
     return (
         <div>
             <div>{content}</div>
-            <button onClick={model.call}>Refresh</button>
+            <Button onClick={model.call}>Refresh</Button>
         </div>
     );
 }
@@ -79,11 +80,9 @@ async function readApis() {
 function renderApiCallResult(message: string, result: PromiseSettledResult<any>) {
     switch (result.status) {
         case "fulfilled":
-            console.debug("Ok renderApiCallResult",result)
             return <Badge color="green" text={"Result of " + message + " " + result.value.message} icon="heart"/>;
 
         default:
-            console.debug("Failed renderApiCallResult",result)
             return <Badge color="red" text={"Result of " + message + " " + result.reason.config.method + " " + result.reason.config.url + " " + result.reason.status + " " + result.reason.statusText + " " + result.reason.data.message} icon="bug"/>;
     }
 }

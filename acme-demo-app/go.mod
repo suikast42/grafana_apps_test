@@ -1,6 +1,6 @@
 module github.com/acme/demo
 
-go 1.21
+go 1.23
 
 require (
 	github.com/grafana/grafana-plugin-sdk-go v0.250.0
