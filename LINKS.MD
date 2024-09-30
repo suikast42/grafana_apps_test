@@ -14,4 +14,11 @@
 
 [Grafana scenes ML](https://grafana.com/developers/scenes/scenes-ml/getting-started)
 
+[Grafana plugin-tools](https://grafana.com/developers/plugin-tools)
+
 [Grafana icons](https://github.com/grafana/grafana/tree/main/packages/grafana-icons)
+
+
+## Repos with examples 
+
+[AWS Sitewise datasource](https://github.com/grafana/iot-sitewise-datasource/blob/main/src/SitewiseDataSource.ts)

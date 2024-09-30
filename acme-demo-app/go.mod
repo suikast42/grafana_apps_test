@@ -3,7 +3,7 @@ module github.com/acme/demo
 go 1.23
 
 require (
-	github.com/grafana/grafana-plugin-sdk-go v0.250.0
+	github.com/grafana/grafana-plugin-sdk-go v0.251.0
 	github.com/magefile/mage v1.15.0
 )
 
