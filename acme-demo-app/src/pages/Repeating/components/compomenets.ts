@@ -1,7 +1,6 @@
 import {StandardVariableQuery, StandardVariableSupport} from "@grafana/data";
 import {DataSource} from "../../../nested-demods-datasource/datasource";
 import {MyDataSourceOptions, MyQuery} from "../../../nested-demods-datasource/types";
-import {MyQueryEditor} from "../../../nested-demods-datasource/components/MyQueryEditor";
 
 export class MyQueryStandardVariableSupport extends StandardVariableSupport<DataSource, MyQuery, MyDataSourceOptions> {
 
@@ -12,7 +11,5 @@ export class MyQueryStandardVariableSupport extends StandardVariableSupport<Data
         };
         return rquery
     }
-
-    editor=  MyQueryEditor;
 
 }
