@@ -7,6 +7,7 @@ import (
 	"github.com/acme/demo/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"math"
+	"strings"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -62,20 +63,36 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 	return response, nil
 }
 
-type queryModel struct{}
-
 func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
-	log.DefaultLogger.Debug("DemoDs query", query.JSON, query.TimeRange, ctx, pCtx)
+
 	var response backend.DataResponse
 
 	// Unmarshal the JSON into our queryModel.
-	var qm queryModel
+	var qm models.QueryModel
 
 	err := json.Unmarshal(query.JSON, &qm)
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("json unmarshal: %v", err.Error()))
 	}
+	log.DefaultLogger.Debug("DemoDs query", qm.QueryText, qm.Constant)
 
+	// TODO: Create an issue why a content from grafana ui is not transmitted with field value a=b ??
+	if qm.QueryText == "devices" {
+		varname := "devices"
+		var values = []string{}
+
+		for i := 1; i <= 10; i++ {
+			values = append(values, fmt.Sprintf("device_%d", i))
+		}
+		frame := data.NewFrame(fmt.Sprintf("frame_%s", varname))
+		frame.Fields = append(frame.Fields,
+			//data.NewField("time", nil, []time.Time{query.TimeRange.From}),
+			data.NewField(varname, nil, values),
+		)
+		response.Frames = append(response.Frames, frame)
+		log.DefaultLogger.Info("Result: " + strings.Join(values, " "))
+		return response
+	}
 	// create data frame response.
 	// For an overview on data frames and how grafana handles them:
 	// https://grafana.com/developers/plugin-tools/introduction/data-frames

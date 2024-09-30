@@ -8,10 +8,14 @@ import {DataSourceWithBackend, getGrafanaLiveSrv, getTemplateSrv} from '@grafana
 
 import {MyQuery, MyDataSourceOptions, DEFAULT_QUERY} from './types';
 import {merge, Observable} from "rxjs";
+import {MyQueryStandardVariableSupport} from "../pages/Repeating/components/compomenets";
+import {types} from "sass";
+import Error = types.Error;
 
 export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptions> {
     constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>) {
         super(instanceSettings);
+        this.variables = new MyQueryStandardVariableSupport()
     }
 
     getDefaultQuery(_: CoreApp): Partial<MyQuery> {
@@ -46,8 +50,19 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
             });
             return merge(...observables);
         }
+        const response = super.query(request)
+        response.forEach(value => {
+            // TODO: create an issue: errors is always undefined
+            if (value.error) {
+                console.error(`Error for call: ${request.targets[0].queryText}.  Error message is: ${value.error.message}`);
+            }
 
-        return super.query(request);
 
+        }).then(r => {
+            if (r !== undefined) {
+                console.log(r)
+            }
+        });
+        return response
     }
 }
