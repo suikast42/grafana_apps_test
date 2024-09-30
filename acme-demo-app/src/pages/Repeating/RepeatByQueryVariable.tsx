@@ -8,9 +8,8 @@ import {
     SceneVariableSet,
     useSceneApp, VariableValueSelectors
 } from '@grafana/scenes';
-import {DATASOURCE_CUSTOMDS_REF, DATASOURCE_REF, ROUTES} from '../../constants';
+import {DATASOURCE_CUSTOMDS_REF, ROUTES} from '../../constants';
 import { prefixRoute } from '../../utils/utils.routing';
-import { getBasicScene } from '../Home/scenes';
 
 const getTab1Scene = () => {
     const timeRange = new SceneTimeRange({
@@ -56,7 +55,7 @@ const getTab1Scene = () => {
                 new SceneFlexItem({
                     body: PanelBuilders.timeseries()
                         // Title is using variable value
-                        .setTitle(option.value)
+                        .setTitle(option.value.toString())
                         .build(),
                 }),
             ],

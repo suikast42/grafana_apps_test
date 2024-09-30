@@ -8,14 +8,16 @@ import {DataSourceWithBackend, getGrafanaLiveSrv, getTemplateSrv} from '@grafana
 
 import {MyQuery, MyDataSourceOptions, DEFAULT_QUERY} from './types';
 import {merge, Observable} from "rxjs";
-import {MyQueryStandardVariableSupport} from "../pages/Repeating/components/compomenets";
-import {types} from "sass";
-import Error = types.Error;
+import {
+    MyQueryStandardVariableSupport
+} from "../pages/Repeating/components/compomenets";
 
 export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptions> {
     constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>) {
         super(instanceSettings);
         this.variables = new MyQueryStandardVariableSupport()
+        // this.variables = new MyQueryCustomVariableSupport(this)
+        // this.variables = new MyQueryDataSourceVariableSupport()
     }
 
     getDefaultQuery(_: CoreApp): Partial<MyQuery> {
