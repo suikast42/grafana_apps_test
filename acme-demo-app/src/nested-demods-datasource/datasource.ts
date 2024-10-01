@@ -53,16 +53,18 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
             return merge(...observables);
         }
         const response = super.query(request)
-        response.forEach(value => {
+        response.forEach((value) => {
             // TODO: create an issue: errors is always undefined
+            console.info(`Call: ${request.targets[0].queryText}`);
             if (value.error) {
                 console.error(`Error for call: ${request.targets[0].queryText}.  Error message is: ${value.error.message}`);
+
             }
 
 
         }).then(r => {
             if (r !== undefined) {
-                console.log(r)
+                console.error(r)
             }
         });
         return response

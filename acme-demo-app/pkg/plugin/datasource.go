@@ -74,6 +74,7 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("json unmarshal: %v", err.Error()))
 	}
+
 	log.DefaultLogger.Debug("DemoDs query", qm.QueryText, qm.Constant)
 
 	// TODO: Create an issue why a content from grafana ui is not transmitted with field value a=b ??
@@ -98,12 +99,30 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 	// https://grafana.com/developers/plugin-tools/introduction/data-frames
 	frame := data.NewFrame("response")
 
-	// add fields.
-	frame.Fields = append(frame.Fields,
-		data.NewField("time", nil, []time.Time{query.TimeRange.From, query.TimeRange.To}),
-		data.NewField("values", nil, []int64{1, 200}),
-	)
+	times := []time.Time{}
+	values := []int64{}
+	devices := []string{}
 
+	for i := 1; i <= 10; i++ {
+		// add fields.
+		deviceName := fmt.Sprintf("device_%d", i)
+		labels := make(map[string]string)
+		labels["device"] = deviceName
+		//times = append(times, query.TimeRange.From, query.TimeRange.To)
+		//values = append(values, 1*int64(i), 2*int64(i))
+		//devices = append(devices, deviceName, deviceName)
+
+		frame.Fields = append(frame.Fields,
+			data.NewField("time", labels, append(times, query.TimeRange.From, query.TimeRange.To)),
+			data.NewField("values", labels, append(values, 1*int64(i), 2*int64(i))),
+			data.NewField("devices", labels, append(devices, deviceName, deviceName)),
+		)
+	}
+	//frame.Fields = append(frame.Fields,
+	//	data.NewField("time", nil, times),
+	//	data.NewField("values", nil, values),
+	//	data.NewField("devices", nil, devices),
+	//)
 	// add the frames to the response.
 	response.Frames = append(response.Frames, frame)
 

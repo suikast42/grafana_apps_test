@@ -18,10 +18,11 @@ export class MyQueryStandardVariableSupport extends StandardVariableSupport<Data
         const rquery: MyQuery = {
             refId : query.refId,
             // @ts-ignore
-            queryText:  query.quertyText,
+            queryText:  query.queryText,
         };
         return rquery
     }
+
 
 }
 

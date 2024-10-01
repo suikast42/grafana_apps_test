@@ -1,15 +1,17 @@
 import React, {  } from 'react';
 import {
     EmbeddedScene,
-    PanelBuilders, QueryVariable,
+    QueryVariable,
     SceneApp,
-    SceneAppPage, SceneByVariableRepeater, SceneControlsSpacer, SceneFlexItem,
+    SceneAppPage, SceneByVariableRepeater, SceneControlsSpacer,
     SceneFlexLayout, SceneQueryRunner, SceneRefreshPicker, SceneTimePicker, SceneTimeRange,
     SceneVariableSet,
     useSceneApp, VariableValueSelectors
 } from '@grafana/scenes';
 import {DATASOURCE_CUSTOMDS_REF, ROUTES} from '../../constants';
 import { prefixRoute } from '../../utils/utils.routing';
+import {VariableRefresh} from "@grafana/data";
+import {getDeviceVizPanel} from "./components/DeviceVizPanel";
 
 const getTab1Scene = () => {
     const timeRange = new SceneTimeRange({
@@ -21,9 +23,9 @@ const getTab1Scene = () => {
         datasource: DATASOURCE_CUSTOMDS_REF,
         query:{
             refId: 'A',
-            datasource: DATASOURCE_CUSTOMDS_REF,
-            quertyText: "devices",
-            constant:1
+            queryText: "devices",
+            constant: 2.1,
+            refresh:VariableRefresh.onTimeRangeChanged,
         },
         allValue: "All",
         isMulti: true,
@@ -33,14 +35,13 @@ const getTab1Scene = () => {
     })
     const dataQuery = new SceneQueryRunner({
         datasource: DATASOURCE_CUSTOMDS_REF,
-        liveStreaming: true,
-        $timeRange: new SceneTimeRange({from: 'now-20s', to: 'now'}),
+        liveStreaming: false,
+        $timeRange: new SceneTimeRange({from: 'now-24h', to: 'now'}),
         queries: [
             {
                 refId: 'A',
-                datasource: DATASOURCE_CUSTOMDS_REF,
-                quertyText: "timesteries",
-                constant: 1,
+                queryText: "timeseries",
+                constant: 4.2,
             },
         ],
 
@@ -51,13 +52,16 @@ const getTab1Scene = () => {
             children: [],
         }),
         getLayoutChild: (option) => new SceneFlexLayout({
+            minWidth:400,
+            maxHeight:400,
             children: [
-                new SceneFlexItem({
-                    body: PanelBuilders.timeseries()
-                        // Title is using variable value
-                        .setTitle(option.value.toString())
-                        .build(),
-                }),
+                // new SceneFlexItem({
+                //     body: PanelBuilders.timeseries()
+                //         // Title is using variable value
+                //         .setTitle(option.value.toString())
+                //         .build(),
+                // }),
+                getDeviceVizPanel(option.value),
             ],
         }),
     })
@@ -79,6 +83,8 @@ const getTab1Scene = () => {
         ],
     });
 };
+
+
 
 
 
