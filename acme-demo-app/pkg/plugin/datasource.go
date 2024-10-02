@@ -7,6 +7,7 @@ import (
 	"github.com/acme/demo/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"math"
+	"regexp"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -72,9 +73,23 @@ const (
 	devices_default   queryOps = "devices_default"
 )
 
+// Regex path
+var (
+	Devices_regex_onlyselected = func() *regexp.Regexp {
+		// */*/?|{...}
+		result, err := regexp.Compile("^.*/.*(\\?.+)|(\\{.+\\})")
+
+		if err == nil {
+			return result
+		}
+		log.DefaultLogger.Error("Can't create devices_regex_onlyselected. Every regex call will deny. Kommst hier net rein 🫣. ", err)
+		return regexp.MustCompile(`\b\B`)
+	}()
+)
+
 func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
 
-	var response backend.DataResponse
+	//var response backend.DataResponse
 
 	// Unmarshal the JSON into our queryModel.
 	var qm models.QueryModel
@@ -84,8 +99,11 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("json unmarshal: %v", err.Error()))
 	}
 
-	log.DefaultLogger.Debug("DemoDs query", qm.QueryText, qm.Constant)
-
+	//log.DefaultLogger.Debug("DemoDs query", qm.QueryText, qm.Constant)
+	log.DefaultLogger.Info("deviceName:", Devices_regex_onlyselected.Match([]byte(qm.QueryText)), " QueryText: ", qm.QueryText)
+	if Devices_regex_onlyselected.Match([]byte(qm.QueryText)) {
+		return QueryDevicesWithFramesAndLabelsFiltered(qm, ctx, pCtx, query)
+	}
 	// TODO: Create an issue why a content from grafana ui is not transmitted with field value a=b ??
 	switch qm.QueryText {
 
@@ -103,39 +121,39 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 		return QueryDeviceDefault(qm, ctx, pCtx, query)
 	}
 
-	// create data frame response.
-	// For an overview on data frames and how grafana handles them:
-	// https://grafana.com/developers/plugin-tools/introduction/data-frames
-	frame := data.NewFrame("response")
-
-	times := []time.Time{}
-	values := []int64{}
-	devices := []string{}
-
-	for i := 1; i <= 10; i++ {
-		// add fields.
-		deviceName := fmt.Sprintf("device_%d", i)
-		labels := make(map[string]string)
-		labels["device"] = deviceName
-		//times = append(times, query.TimeRange.From, query.TimeRange.To)
-		//values = append(values, 1*int64(i), 2*int64(i))
-		//devices = append(devices, deviceName, deviceName)
-
-		frame.Fields = append(frame.Fields,
-			data.NewField("time", labels, append(times, query.TimeRange.From, query.TimeRange.To)),
-			data.NewField("values", labels, append(values, 1*int64(i), 2*int64(i))),
-			data.NewField("devices", labels, append(devices, deviceName, deviceName)),
-		)
-	}
-	//frame.Fields = append(frame.Fields,
-	//	data.NewField("time", nil, times),
-	//	data.NewField("values", nil, values),
-	//	data.NewField("devices", nil, devices),
-	//)
-	// add the frames to the response.
-	response.Frames = append(response.Frames, frame)
-
-	return response
+	//// create data frame response.
+	//// For an overview on data frames and how grafana handles them:
+	//// https://grafana.com/developers/plugin-tools/introduction/data-frames
+	//frame := data.NewFrame("response")
+	//
+	//times := []time.Time{}
+	//values := []int64{}
+	//devices := []string{}
+	//
+	//for i := 1; i <= 10; i++ {
+	//	// add fields.
+	//	deviceName := fmt.Sprintf("device_%d", i)
+	//	labels := make(map[string]string)
+	//	labels["device"] = deviceName
+	//	//times = append(times, query.TimeRange.From, query.TimeRange.To)
+	//	//values = append(values, 1*int64(i), 2*int64(i))
+	//	//devices = append(devices, deviceName, deviceName)
+	//
+	//	frame.Fields = append(frame.Fields,
+	//		data.NewField("time", labels, append(times, query.TimeRange.From, query.TimeRange.To)),
+	//		data.NewField("values", labels, append(values, 1*int64(i), 2*int64(i))),
+	//		data.NewField("devices", labels, append(devices, deviceName, deviceName)),
+	//	)
+	//}
+	////frame.Fields = append(frame.Fields,
+	////	data.NewField("time", nil, times),
+	////	data.NewField("values", nil, values),
+	////	data.NewField("devices", nil, devices),
+	////)
+	//// add the frames to the response.
+	//response.Frames = append(response.Frames, frame)
+	//
+	//return response
 }
 
 // CheckHealth handles health checks sent from Grafana to the plugin.

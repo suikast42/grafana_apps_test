@@ -15,7 +15,7 @@ export const getTabRepeatByDataframe = () => {
         from: 'now-6h',
         to: 'now',
     });
-    const devicesVariable = new QueryVariable({
+    const queryVariables = new QueryVariable({
         name: 'devices',
         datasource: DATASOURCE_CUSTOMDS_REF,
         query:{
@@ -37,8 +37,8 @@ export const getTabRepeatByDataframe = () => {
         queries: [
             {
                 refId: 'A',
-                queryText: 'devices_per_frame',
-                constant: 4.2,
+                queryText: 'devices_per_frame/devices?$devices',
+                constant: 2.78,
             },
         ],
 
@@ -67,7 +67,7 @@ export const getTabRepeatByDataframe = () => {
     return new EmbeddedScene({
         $timeRange: timeRange,
         $variables: new SceneVariableSet({
-            variables: [devicesVariable],
+            variables: [queryVariables],
         }),
         $data: dataQuery,
         body: body,
