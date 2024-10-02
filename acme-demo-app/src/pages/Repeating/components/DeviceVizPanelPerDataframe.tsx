@@ -1,5 +1,5 @@
-import {DataFrame,  PanelPlugin, PanelProps} from "@grafana/data";
-import {sceneUtils, VariableValueSingle, VizPanel} from "@grafana/scenes";
+import {DataFrame, PanelPlugin, PanelProps} from "@grafana/data";
+import {sceneUtils, VariableValueSingle, VizPanel, VizPanelState} from "@grafana/scenes";
 import React from "react";
 import {PanelDataErrorView} from "@grafana/runtime";
 import {Device, DeviceRenderer} from "./Device";
@@ -15,7 +15,7 @@ interface DeviceVizFieldOptions {
 interface DeviceVizProps extends PanelProps<DeviceVizOptions> {
 }
 
-function DeviceVizPanel(props: DeviceVizProps) {
+function DeviceVizPanelPerDataframe(props: DeviceVizProps) {
     const {id, fieldConfig, data, options} = props;
     const dataFrame = data.series;
 
@@ -28,12 +28,13 @@ function DeviceVizPanel(props: DeviceVizProps) {
         return <PanelDataErrorView panelId={id} fieldConfig={fieldConfig} data={data}
                                    message={"No data send from backend"}/>;
     }
-
-    if (dataFrame.length > 1) {
+    const deviceIndex = dataFrame.findIndex(value => value.name === props.options.devicename)
+    if( deviceIndex < 0 ){
         return <PanelDataErrorView panelId={id} fieldConfig={fieldConfig} data={data}
-                                   message={"🤬 Unexpected size of dataFrame: " + dataFrame.length}/>;
+                                   message={"🤷‍♂️ No device found in the frame "}/>;
     }
-    const device = mapLastDeviceValues(options.devicename, dataFrame)
+
+    const device = mapLastDeviceValue(options.devicename, dataFrame[deviceIndex])
 
 
     if (device === null || device === undefined) {
@@ -41,6 +42,7 @@ function DeviceVizPanel(props: DeviceVizProps) {
                                    message={"Could not find a device for " + options.devicename}/>;
     }
     return DeviceRenderer({model: device});
+    // return getRoomsTemperatureStats();
     // try {
     //     // dataFrameToJSON(data.series[0]
     //
@@ -65,7 +67,8 @@ function DeviceVizPanel(props: DeviceVizProps) {
     // }
 }
 
-export const getDeviceVizPanel = (devicename: VariableValueSingle) => {
+
+export const getDeviceVizPanelPerDataframe = (devicename: VariableValueSingle,data:  VizPanelState['$data']) => {
     // const myCustomPanel = new PanelPlugin<DeviceVizOptions, DeviceVizFieldOptions>(DeviceVizPanel)
     //     .useFieldConfig({
     //     useCustomConfig: (builder) => {
@@ -78,14 +81,14 @@ export const getDeviceVizPanel = (devicename: VariableValueSingle) => {
     //     },
     // });
 
-    const myCustomPanel = new PanelPlugin<DeviceVizOptions, DeviceVizFieldOptions>(DeviceVizPanel)
+    const myCustomPanel = new PanelPlugin<DeviceVizOptions, DeviceVizFieldOptions>(DeviceVizPanelPerDataframe)
     try {
-        sceneUtils.registerRuntimePanelPlugin({pluginId: 'device-state-viz', plugin: myCustomPanel});
+        sceneUtils.registerRuntimePanelPlugin({pluginId: 'device-state-df-viz', plugin: myCustomPanel});
     } catch (e) {
         let handled = false
         if (e instanceof Error) {
             const err = e as Error
-            if (err.message === "A runtime panel plugin with id device-state-viz has already been registered") {
+            if (err.message === "A runtime panel plugin with id device-state-df-viz has already been registered") {
                 handled = true;
             }
         }
@@ -98,10 +101,13 @@ export const getDeviceVizPanel = (devicename: VariableValueSingle) => {
 
 
     const panel = new VizPanel({
-        pluginId: 'device-state-viz',
+        pluginId: 'device-state-df-viz',
         title: devicename.toString(),
         displayMode: "transparent",
-        options: {devicename: devicename.toString()},
+        $data:data  ,
+        options: {
+
+            devicename: devicename.toString()},
         fieldConfig: {
             defaults: {
                 unit: 'ms',
@@ -113,16 +119,18 @@ export const getDeviceVizPanel = (devicename: VariableValueSingle) => {
         },
     });
 
+
+
     return panel;
 };
 
 
-const mapLastDeviceValues = (deviceName: string, dfs: DataFrame[] | undefined): Device | undefined => {
-    if (dfs === undefined) {
-        return undefined;
-    }
-    return mapLastDeviceValue(deviceName, dfs[dfs.length - 1])
-}
+// const mapLastDeviceValues = (deviceName: string, dfs: DataFrame[] | undefined): Device | undefined => {
+//     if (dfs === undefined) {
+//         return undefined;
+//     }
+//     return mapLastDeviceValue(deviceName, dfs[dfs.length - 1])
+// }
 
 const mapLastDeviceValue = (deviceName: string, df: DataFrame | undefined): Device | undefined => {
     try {
@@ -133,9 +141,9 @@ const mapLastDeviceValue = (deviceName: string, df: DataFrame | undefined): Devi
         // const name = df.fields.find((field) => field.name === 'devices')?.values;
         // const value = df.fields.find((field) => field.name === 'values')?.values;
         let reversedFields = df.fields.reverse();
-        const timeField = reversedFields.find(field => field.labels?.['device']===deviceName && field.name === 'time')?.values;
-        const name = reversedFields.find((field) => field.labels?.['device']===deviceName && field.name === 'devices')?.values;
-        const value = reversedFields.find((field) => field.labels?.['device']===deviceName && field.name === 'values')?.values;
+        const timeField = reversedFields.find(field => field.labels?.['device'] === deviceName && field.name === 'time')?.values;
+        const name = reversedFields.find((field) => field.labels?.['device'] === deviceName && field.name === 'devices')?.values;
+        const value = reversedFields.find((field) => field.labels?.['device'] === deviceName && field.name === 'values')?.values;
         if (!timeField || !name || !value) {
             return undefined;
         }

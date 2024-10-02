@@ -1,19 +1,16 @@
-import React, {  } from 'react';
 import {
     EmbeddedScene,
     QueryVariable,
-    SceneApp,
-    SceneAppPage, SceneByVariableRepeater, SceneControlsSpacer,
-    SceneFlexLayout, SceneQueryRunner, SceneRefreshPicker, SceneTimePicker, SceneTimeRange,
-    SceneVariableSet,
-    useSceneApp, VariableValueSelectors
-} from '@grafana/scenes';
-import {DATASOURCE_CUSTOMDS_REF, ROUTES} from '../../constants';
-import { prefixRoute } from '../../utils/utils.routing';
+    SceneByVariableRepeater, SceneControlsSpacer,
+    SceneFlexLayout,
+    SceneQueryRunner, SceneRefreshPicker, SceneTimePicker,
+    SceneTimeRange, SceneVariableSet, VariableValueSelectors
+} from "@grafana/scenes";
+import {DATASOURCE_CUSTOMDS_REF} from "../../constants";
 import {VariableRefresh} from "@grafana/data";
 import {getDeviceVizPanel} from "./components/DeviceVizPanel";
 
-const getTab1Scene = () => {
+export const getTabRepeatByQueryVariable = () => {
     const timeRange = new SceneTimeRange({
         from: 'now-6h',
         to: 'now',
@@ -40,13 +37,13 @@ const getTab1Scene = () => {
         queries: [
             {
                 refId: 'A',
-                queryText: "timeseries",
+                queryText: "devices_per_label",
                 constant: 4.2,
             },
         ],
 
     })
-   const body=  new SceneByVariableRepeater({
+    const body=  new SceneByVariableRepeater({
         variableName: 'devices',
         body: new SceneFlexLayout({
             children: [],
@@ -84,39 +81,3 @@ const getTab1Scene = () => {
     });
 };
 
-
-
-
-
-const getScene = () =>
-    new SceneApp({
-        pages: [
-            new SceneAppPage({
-                title: 'Examples ho to repeat panels and scenes objects',
-                subTitle: 'This scene showcases a basic tabs functionality.',
-                // Important: Mind the page route is ambiguous for the tabs to work properly
-                url: prefixRoute(`${ROUTES.Repeating}`),
-                hideFromBreadcrumbs: true,
-                getScene: getTab1Scene,
-                tabs: [
-                    new SceneAppPage({
-                        title: 'Repeat by Variable',
-                        url: prefixRoute(`${ROUTES.Repeating}`),
-                        getScene: getTab1Scene,
-                    }),
-                    // new SceneAppPage({
-                    //     title: 'House locations',
-                    //     url: prefixRoute(`${ROUTES.Repeating}/tab-two`),
-                    //     getScene: getTab2Scene,
-                    // }),
-                ],
-            }),
-        ],
-    });
-
-const PageWithRepeating = () => {
-    const scene = useSceneApp(getScene);
-    return <scene.Component model={scene} />;
-};
-
-export default PageWithRepeating;

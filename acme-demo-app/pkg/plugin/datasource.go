@@ -7,7 +7,6 @@ import (
 	"github.com/acme/demo/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"math"
-	"strings"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -63,6 +62,16 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 	return response, nil
 }
 
+type queryOps string
+
+const (
+	devices           queryOps = "devices"
+	devices_per_frame queryOps = "devices_per_frame"
+	devices_per_label queryOps = "devices_per_label"
+	devices_no_label  queryOps = "devices_no_label"
+	devices_default   queryOps = "devices_default"
+)
+
 func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
 
 	var response backend.DataResponse
@@ -78,22 +87,22 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 	log.DefaultLogger.Debug("DemoDs query", qm.QueryText, qm.Constant)
 
 	// TODO: Create an issue why a content from grafana ui is not transmitted with field value a=b ??
-	if qm.QueryText == "devices" {
-		varname := "devices"
-		var values = []string{}
+	switch qm.QueryText {
 
-		for i := 1; i <= 10; i++ {
-			values = append(values, fmt.Sprintf("device_%d", i))
-		}
-		frame := data.NewFrame(fmt.Sprintf("frame_%s", varname))
-		frame.Fields = append(frame.Fields,
-			//data.NewField("time", nil, []time.Time{query.TimeRange.From}),
-			data.NewField(varname, nil, values),
-		)
-		response.Frames = append(response.Frames, frame)
-		log.DefaultLogger.Info("Result: " + strings.Join(values, " "))
-		return response
+	case string(devices):
+		return QueryDeviceNames(qm, ctx, pCtx, query)
+	case string(devices_per_label):
+		return QueryDevicesWithLabels(qm, ctx, pCtx, query)
+	case string(devices_per_frame):
+		return QueryDevicesWithFramesAndLabels(qm, ctx, pCtx, query)
+	case string(devices_no_label):
+		return QueryDevicesWithoutLabels(qm, ctx, pCtx, query)
+	case string(devices_default):
+		return QueryDeviceDefault(qm, ctx, pCtx, query)
+	default:
+		return QueryDeviceDefault(qm, ctx, pCtx, query)
 	}
+
 	// create data frame response.
 	// For an overview on data frames and how grafana handles them:
 	// https://grafana.com/developers/plugin-tools/introduction/data-frames

@@ -2,7 +2,7 @@ import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { prefixRoute } from '../../utils/utils.routing';
 import { ROUTES } from '../../constants';
-import PageWithRepeating from "../../pages/Repeating/RepeatByQueryVariable";
+import PageWithRepeating from "../../pages/Repeating/PageWithRepeating";
 const HomePage = React.lazy(() => import('../../pages/Home/Home'));
 const PageWithTabs = React.lazy(() => import('../../pages/WithTabs/WithTabs'));
 const WithDrilldown = React.lazy(() => import('../../pages/WithDrilldown/WithDrilldown'));
