@@ -21,11 +21,13 @@ const getScene = () =>
                         title: 'Repeat by QueryVariable',
                         url: prefixRoute(`${ROUTES.Repeating}`),
                         getScene: getTabRepeatByQueryVariable,
+                        titleIcon: "repeat"
                     }),
                     new SceneAppPage({
                         title: 'Repeat by Dataframe',
                         url: prefixRoute(`${ROUTES.Repeating}/tab-two`),
                         getScene: getTabRepeatByDataframe,
+                        titleIcon: "repeat"
                     }),
                     // new SceneAppPage({
                     //     title: 'House locations',
