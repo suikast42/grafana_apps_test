@@ -47,7 +47,7 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
                     addr: {
                         scope: LiveChannelScope.DataSource,
                         namespace: this.uid,
-                        path: `my-ws/custom-${query.queryText}`, // this will allow each new query to create a new connection
+                        path: `${query.queryText}/${query.pathFilter}`, // this will allow each new query to create a new connection
                         data: {
                             ...query,
                         },
@@ -59,7 +59,7 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
         const response = super.query(request)
         response.forEach((value) => {
             // TODO: create an issue: errors is always undefined
-            console.info(`Call: ${request.targets[0].queryText}`);
+            console.info(`Call queryText: ${request.targets[0].queryText}. PathFilter: ${request.targets[0].pathFilter}`);
             if (value.error) {
                 console.error(`Error for call: ${request.targets[0].queryText}.  Error message is: ${value.error.message}`);
 

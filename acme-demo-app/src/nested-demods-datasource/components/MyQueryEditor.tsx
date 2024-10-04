@@ -16,8 +16,12 @@ export function MyQueryEditor({query, onChange, onRunQuery}: Props) {
         // executes the query
         onRunQuery();
     };
-
-    const {queryText, constant} = query;
+    const onPathFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
+        onChange({...query, pathFilter: event.target.value});
+        // executes the query
+        onRunQuery();
+    };
+    const {queryText, constant,pathFilter} = query;
 
     return (
         <Stack gap={0}>
@@ -31,13 +35,21 @@ export function MyQueryEditor({query, onChange, onRunQuery}: Props) {
                     step="0.1"
                 />
             </InlineField>
-            <InlineField label="Query Text" labelWidth={16} tooltip="Not used yet">
+            <InlineField label="Query Text" labelWidth={16} >
                 <Input
                     id="query-editor-query-text"
                     onChange={onQueryTextChange}
                     value={queryText || ''}
                     required
                     placeholder="Enter a query"
+                />
+            </InlineField>
+            <InlineField label="Pathfilter" labelWidth={16} >
+                <Input
+                    id="query-editor-query-pathfilter"
+                    onChange={onPathFilterChange}
+                    value={pathFilter || ''}
+
                 />
             </InlineField>
         </Stack>

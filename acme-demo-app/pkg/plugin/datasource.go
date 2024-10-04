@@ -231,7 +231,11 @@ func (d *Datasource) RunStream(ctx context.Context, req *backend.RunStreamReques
 	for {
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			var err = ctx.Err()
+			if err != nil {
+				log.DefaultLogger.Error(err.Error())
+			}
+			return err
 		case <-ticker.C:
 			// We generate a sinusoidal value with a period of 2π (360 degrees)
 			// `r` is assumed to be the current time or phase in the sine wave
@@ -243,17 +247,43 @@ func (d *Datasource) RunStream(ctx context.Context, req *backend.RunStreamReques
 			if degree >= 360 {
 				degree = 0
 			}
-			err := sender.SendFrame(
-				data.NewFrame(
-					"response",
-					data.NewField("time", nil, []time.Time{time.Now()}),
-					data.NewField("value", nil, []float64{sinusoidalValue})),
-				data.IncludeAll,
-			)
+			frame := data.NewFrame("response-stream")
+
+			for i := 1; i <= 10; i++ {
+				deviceName := fmt.Sprintf("device_%d", i)
+				labels := make(map[string]string)
+				labels["device"] = deviceName
+				//times = append(times, query.TimeRange.From, query.TimeRange.To)
+				//values = append(values, 1*int64(i), 2*int64(i))
+				//devices = append(devices, deviceName, deviceName)
+
+				frame.Fields = append(frame.Fields,
+					data.NewField("time", labels, []time.Time{time.Now()}),
+					data.NewField("devices", labels, []string{deviceName}),
+					data.NewField("value", labels, []float64{sinusoidalValue}))
+			}
+			err := sender.SendFrame(frame, data.IncludeAll)
 
 			if err != nil {
 				log.DefaultLogger.Error("Failed to send frame", "error", err)
 			}
+
+			//for i := 1; i <= 10; i++ {
+			//	var device = fmt.Sprintf("device_%d", i)
+			//	labels := make(map[string]string)
+			//	labels["device"] = device
+			//	frame := data.NewFrame(device)
+			//	frame.Fields = append(frame.Fields,
+			//		data.NewField("time", labels, []time.Time{time.Now()}),
+			//		data.NewField("devices", labels, []string{device}),
+			//		data.NewField("value", labels, []float64{sinusoidalValue}))
+			//	err := sender.SendFrame(frame, data.IncludeAll)
+			//
+			//	if err != nil {
+			//		log.DefaultLogger.Error("Failed to send frame", "error", err)
+			//	}
+			//}
+
 		}
 	}
 }

@@ -28,13 +28,13 @@ function DeviceVizPanelPerDataframe(props: DeviceVizProps) {
         return <PanelDataErrorView panelId={id} fieldConfig={fieldConfig} data={data}
                                    message={"No data send from backend"}/>;
     }
-    const deviceIndex = dataFrame.findIndex(value => value.name === props.options.devicename)
-    if( deviceIndex < 0 ){
-        return <PanelDataErrorView panelId={id} fieldConfig={fieldConfig} data={data}
-                                   message={"🤷‍♂️ No device found in the frame "}/>;
-    }
+    // const deviceIndex = dataFrame.findIndex(value => value.name === props.options.devicename)
+    // if( deviceIndex < 0 ){
+    //     return <PanelDataErrorView panelId={id} fieldConfig={fieldConfig} data={data}
+    //                                message={"🤷‍♂️ No device found in the frame "}/>;
+    // }
 
-    const device = mapLastDeviceValue(options.devicename, dataFrame[deviceIndex])
+    const device = mapLastDeviceValues(options.devicename, dataFrame)
 
 
     if (device === null || device === undefined) {
@@ -68,7 +68,7 @@ function DeviceVizPanelPerDataframe(props: DeviceVizProps) {
 }
 
 
-export const getDeviceVizPanelPerDataframe = (devicename: VariableValueSingle,data:  VizPanelState['$data']) => {
+export const getDeviceVizPanelPerDataframe = (devicename: VariableValueSingle, data: VizPanelState['$data']) => {
     // const myCustomPanel = new PanelPlugin<DeviceVizOptions, DeviceVizFieldOptions>(DeviceVizPanel)
     //     .useFieldConfig({
     //     useCustomConfig: (builder) => {
@@ -104,10 +104,11 @@ export const getDeviceVizPanelPerDataframe = (devicename: VariableValueSingle,da
         pluginId: 'device-state-df-viz',
         title: devicename.toString(),
         displayMode: "transparent",
-        $data:data  ,
+        $data: data,
         options: {
 
-            devicename: devicename.toString()},
+            devicename: devicename.toString()
+        },
         fieldConfig: {
             defaults: {
                 unit: 'ms',
@@ -120,17 +121,16 @@ export const getDeviceVizPanelPerDataframe = (devicename: VariableValueSingle,da
     });
 
 
-
     return panel;
 };
 
 
-// const mapLastDeviceValues = (deviceName: string, dfs: DataFrame[] | undefined): Device | undefined => {
-//     if (dfs === undefined) {
-//         return undefined;
-//     }
-//     return mapLastDeviceValue(deviceName, dfs[dfs.length - 1])
-// }
+const mapLastDeviceValues = (deviceName: string, dfs: DataFrame[] | undefined): Device | undefined => {
+    if (dfs === undefined) {
+        return undefined;
+    }
+    return mapLastDeviceValue(deviceName, dfs[dfs.length - 1])
+}
 
 const mapLastDeviceValue = (deviceName: string, df: DataFrame | undefined): Device | undefined => {
     try {
@@ -143,11 +143,12 @@ const mapLastDeviceValue = (deviceName: string, df: DataFrame | undefined): Devi
         let reversedFields = df.fields.reverse();
         const timeField = reversedFields.find(field => field.labels?.['device'] === deviceName && field.name === 'time')?.values;
         const name = reversedFields.find((field) => field.labels?.['device'] === deviceName && field.name === 'devices')?.values;
-        const value = reversedFields.find((field) => field.labels?.['device'] === deviceName && field.name === 'values')?.values;
+        const value = reversedFields.find((field) => field.labels?.['device'] === deviceName && field.name === 'value')?.values;
         if (!timeField || !name || !value) {
             return undefined;
         }
         const devicenameIndex = name.lastIndexOf(deviceName)
+
         if (devicenameIndex === -1) {
             return undefined;
         }
@@ -155,7 +156,8 @@ const mapLastDeviceValue = (deviceName: string, df: DataFrame | undefined): Devi
         // const firstDeviceIndex = name.indexOf(deviceName)
 
         return new Device({
-            name: name[devicenameIndex]
+            name: name[devicenameIndex],
+            value: value[devicenameIndex],
         })
     } catch (e) {
         console.error(e);

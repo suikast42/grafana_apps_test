@@ -32,12 +32,13 @@ export const getTabRepeatByDataframe = () => {
     })
     const dataQuery = new SceneQueryRunner({
         datasource: DATASOURCE_CUSTOMDS_REF,
-        liveStreaming: false,
+        liveStreaming: true,
         $timeRange: new SceneTimeRange({from: 'now-24h', to: 'now'}),
         queries: [
             {
                 refId: 'A',
-                queryText: 'devices_per_frame/devices?$devices',
+                queryText: 'devices_per_frame/devices',
+                // pathFilter: '$devices',
                 constant: 2.78,
             },
         ],
@@ -55,7 +56,7 @@ export const getTabRepeatByDataframe = () => {
             return new SceneFlexItem({
                 height: '50%',
                 minWidth: '20%',
-                body: getDeviceVizPanelPerDataframe(frame.name || 'no device found in frame',new SceneDataNode({
+                body: getDeviceVizPanelPerDataframe(frame.name || 'no device found in frame.',new SceneDataNode({
                     data: {
                         ...data,
                         series: [frame],
@@ -64,6 +65,7 @@ export const getTabRepeatByDataframe = () => {
             });
         },
     });
+
     return new EmbeddedScene({
         $timeRange: timeRange,
         $variables: new SceneVariableSet({

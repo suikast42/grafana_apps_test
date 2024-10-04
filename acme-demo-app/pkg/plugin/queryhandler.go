@@ -209,3 +209,7 @@ func deviceFilterFromQuery(queryText string) []string {
 	}
 	return result
 }
+func (d *Datasource) RunStreamDevices(qm models.QueryModel, ctx context.Context, req *backend.RunStreamRequest, sender *backend.StreamSender) error {
+
+	return nil
+}

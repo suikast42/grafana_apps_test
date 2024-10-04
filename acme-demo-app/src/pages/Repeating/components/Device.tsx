@@ -4,6 +4,7 @@ import {SceneComponentProps, SceneObjectBase, SceneObjectState} from "@grafana/s
 
 interface DeviceState extends SceneObjectState {
     name: string;
+    value: any;
 }
 
 
@@ -14,13 +15,15 @@ export class Device extends SceneObjectBase<DeviceState> {
 
         super({
             name: "UNKNOWN",
+            value: 0,
             ...state
         });
     }
 
     onUpdate = (update: Device) => {
         super.setState({
-            name: update.state.name
+            name: update.state.name,
+            value  : update.state.value
         });
 
     }
@@ -36,14 +39,17 @@ export function DeviceRenderer({model}: SceneComponentProps<Device>) {
         <>
             <Grid columns={1}>
                 <Grid columns={2} gap={2} alignItems={'start'}>
-                    <text > Last Refresh:</text>
-                    <text > {new Date().toLocaleTimeString()}</text>
+                    <text> Last Refresh:</text>
+                    <text> {new Date().toLocaleTimeString()}</text>
 
                     {/*<text style={{color: colorOfDate(deviceStatus.lastDeviceStatusSince)}}>Last Event time:</text>*/}
                     {/*<text style={{color: colorOfDate(deviceStatus.lastDeviceStatusSince)}}>{deviceStatus.lastDeviceStatusSince?.toLocaleTimeString() || 'UNKOWN'}</text>*/}
 
                     <text>Device Name:</text>
                     <text> {deviceState.name}</text>
+
+                    <text>Device last value:</text>
+                    <text> {deviceState.value}</text>
                     {/*{render &&*/}
                     {/*    <h2>*/}
                     {/*     Render*/}

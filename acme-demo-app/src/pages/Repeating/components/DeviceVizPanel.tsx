@@ -37,6 +37,7 @@ function DeviceVizPanel(props: DeviceVizProps) {
 
 
     if (device === null || device === undefined) {
+
         return <PanelDataErrorView panelId={id} fieldConfig={fieldConfig} data={data}
                                    message={"Could not find a device for " + options.devicename}/>;
     }
@@ -132,22 +133,19 @@ const mapLastDeviceValue = (deviceName: string, df: DataFrame | undefined): Devi
         // const timeField = df.fields.find((field) => field.name === 'time')?.values;
         // const name = df.fields.find((field) => field.name === 'devices')?.values;
         // const value = df.fields.find((field) => field.name === 'values')?.values;
-        let reversedFields = df.fields.reverse();
-        const timeField = reversedFields.find(field => field.labels?.['device']===deviceName && field.name === 'time')?.values;
-        const name = reversedFields.find((field) => field.labels?.['device']===deviceName && field.name === 'devices')?.values;
-        const value = reversedFields.find((field) => field.labels?.['device']===deviceName && field.name === 'values')?.values;
-        if (!timeField || !name || !value) {
+        let reverse = df.fields.reverse();
+        const timeField = reverse.find(field => field.labels?.['device']===deviceName && field.name === 'time')?.values;
+        const value = reverse.find((field) => field.labels?.['device']===deviceName && field.name === 'value')?.values;
+        if (!timeField || !value) {
+            // console.info(`DD- ${timeField}`)
+            // reverse.forEach((field) => console.info(field.labels?.['device'])) // console.info(`DD- ${deviceName}`)
+            // reverse.forEach((field) => console.info(field.labels?.['device']))
             return undefined;
         }
-        const devicenameIndex = name.lastIndexOf(deviceName)
-        if (devicenameIndex === -1) {
-            return undefined;
-        }
-
-        // const firstDeviceIndex = name.indexOf(deviceName)
 
         return new Device({
-            name: name[devicenameIndex]
+            name: deviceName,
+            value : value[df.length-1]
         })
     } catch (e) {
         console.error(e);
