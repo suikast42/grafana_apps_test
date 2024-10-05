@@ -18,7 +18,7 @@ interface DeviceVizProps extends PanelProps<DeviceVizOptions> {
 function DeviceVizPanel(props: DeviceVizProps) {
     const {id, fieldConfig, data, options} = props;
     const dataFrame = data.series;
-    //console.log(options.devicename);
+
     if (options.devicename === undefined || options.devicename === '') {
         return <PanelDataErrorView panelId={id} fieldConfig={fieldConfig} data={data}
                                    message={"devicename is not supported in the options"}/>;
@@ -135,8 +135,11 @@ const mapLastDeviceValue = (deviceName: string, df: DataFrame | undefined): Devi
         // const value = df.fields.find((field) => field.name === 'values')?.values;
         let reverse = df.fields.reverse();
         const timeField = reverse.find(field => field.labels?.['device']===deviceName && field.name === 'time')?.values;
-        const value = reverse.find((field) => field.labels?.['device']===deviceName && field.name === 'value')?.values;
+
+        const value = reverse.find((field) => field.labels?.['device']===deviceName && field.name === 'values')?.values;
+
         if (!timeField || !value) {
+
             // console.info(`DD- ${timeField}`)
             // reverse.forEach((field) => console.info(field.labels?.['device'])) // console.info(`DD- ${deviceName}`)
             // reverse.forEach((field) => console.info(field.labels?.['device']))

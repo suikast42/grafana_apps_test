@@ -9,12 +9,12 @@ type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 export function MyQueryEditor({query, onChange, onRunQuery}: Props) {
     const onQueryTextChange = (event: ChangeEvent<HTMLInputElement>) => {
         onChange({...query, queryText: event.target.value});
+        // executes the query
+        onRunQuery();
     };
 
     const onConstantChange = (event: ChangeEvent<HTMLInputElement>) => {
         onChange({...query, constant: parseFloat(event.target.value)});
-        // executes the query
-        onRunQuery();
     };
     const onPathFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
         onChange({...query, pathFilter: event.target.value});

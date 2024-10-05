@@ -7,7 +7,7 @@ import (
 	"github.com/acme/demo/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"math"
-	"regexp"
+	"strings"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -74,18 +74,6 @@ const (
 )
 
 // Regex path
-var (
-	Devices_regex_onlyselected = func() *regexp.Regexp {
-		// */*/?|{...}
-		result, err := regexp.Compile("^.*/.*(\\?.+)|(\\{.+\\})")
-
-		if err == nil {
-			return result
-		}
-		log.DefaultLogger.Error("Can't create devices_regex_onlyselected. Every regex call will deny. Kommst hier net rein 🫣. ", err)
-		return regexp.MustCompile(`\b\B`)
-	}()
-)
 
 func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
 
@@ -100,10 +88,8 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 	}
 
 	//log.DefaultLogger.Debug("DemoDs query", qm.QueryText, qm.Constant)
-	log.DefaultLogger.Info("deviceName:", Devices_regex_onlyselected.Match([]byte(qm.QueryText)), " QueryText: ", qm.QueryText)
-	if Devices_regex_onlyselected.Match([]byte(qm.QueryText)) {
-		return QueryDevicesWithFramesAndLabelsFiltered(qm, ctx, pCtx, query)
-	}
+	log.DefaultLogger.Info("Incoming query: ", qm.String())
+
 	// TODO: Create an issue why a content from grafana ui is not transmitted with field value a=b ??
 	switch qm.QueryText {
 
@@ -199,7 +185,18 @@ func (d *Datasource) PublishStream(context.Context, *backend.PublishStreamReques
 }
 
 func (d *Datasource) RunStream(ctx context.Context, req *backend.RunStreamRequest, sender *backend.StreamSender) error {
-	log.DefaultLogger.Debug("DemoDs RunStream", req.Path, req.Data, ctx)
+
+	var qm models.QueryModel
+
+	err := json.Unmarshal(req.Data, &qm)
+	if err != nil {
+		return err
+	}
+	log.DefaultLogger.Debug("DemoDs RunStream", qm.String())
+	var filter = "All"
+	if len(qm.PathFilter) > 0 {
+		filter = qm.PathFilter
+	}
 
 	//s := rand.NewSource(time.Now().UnixNano())
 	//r := rand.New(s)
@@ -247,17 +244,22 @@ func (d *Datasource) RunStream(ctx context.Context, req *backend.RunStreamReques
 			if degree >= 360 {
 				degree = 0
 			}
-			singleDataFrameWithLabeledFields(sinusoidalValue, sender)
+			singleDataFrameWithLabeledFields(sinusoidalValue, sender, filter)
 			//multiDataFramesWithLabeledFields(sinusoidalValue, sender)
 
 		}
 	}
 
 }
-func singleDataFrameWithLabeledFields(sinusoidalValue float64, sender *backend.StreamSender) {
+func singleDataFrameWithLabeledFields(sinusoidalValue float64, sender *backend.StreamSender, filter string) {
 	frame := data.NewFrame("devices-stream")
 	for i := 1; i <= 10; i++ {
 		deviceName := fmt.Sprintf("device_%d", i)
+		if filter != "All" && !strings.Contains(filter, deviceName) {
+			log.DefaultLogger.Debug("Filter out ", deviceName)
+			continue
+		}
+
 		labels := make(map[string]string)
 		labels["device"] = deviceName
 		//times = append(times, query.TimeRange.From, query.TimeRange.To)
@@ -276,10 +278,14 @@ func singleDataFrameWithLabeledFields(sinusoidalValue float64, sender *backend.S
 	}
 
 }
-func multiDataFramesWithLabeledFields(sinusoidalValue float64, sender *backend.StreamSender) {
+func multiDataFramesWithLabeledFields(sinusoidalValue float64, sender *backend.StreamSender, filter string) {
 	frame := data.NewFrame("devices-stream")
 	for i := 1; i <= 10; i++ {
 		deviceName := fmt.Sprintf("device_%d", i)
+
+		if filter != "All" && !strings.Contains(filter, deviceName) {
+			continue
+		}
 		labels := make(map[string]string)
 		labels["device"] = deviceName
 		//times = append(times, query.TimeRange.From, query.TimeRange.To)

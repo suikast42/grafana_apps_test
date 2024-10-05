@@ -32,14 +32,10 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
         //     ...query,
         // };
 
-        var pathFilter = ""
-        if(!query.pathFilter){
-            pathFilter = getTemplateSrv().replace(query.pathFilter, scopedVars)
-        }
         return {
             ...query,
             queryText: getTemplateSrv().replace(query.queryText, scopedVars),
-            pathFilter: pathFilter,
+            pathFilter:  getTemplateSrv().replace(query.pathFilter, scopedVars),
         };
     }
 
@@ -54,14 +50,14 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
                 if (!query.pathFilter){
                     console.log(`Call liveStreaming: ${query.queryText}`);
                 }else {
-                    console.log(`Call liveStreaming: ${query.queryText}/${query.pathFilter}`);
+                    console.log(`Call liveStreaming: ${query.queryText} with pathFilter: ${query.pathFilter}`);
                 }
 
                 return getGrafanaLiveSrv().getDataStream({
                     addr: {
                         scope: LiveChannelScope.DataSource,
                         namespace: this.uid,
-                        path: `${query.queryText}`, // this will allow each new query to create a new connection
+                        path: `${query.queryText}/${query.pathFilter}`, // this will allow each new query to create a new connection
                         data: {
                             ...query,
                         },

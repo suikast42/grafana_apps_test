@@ -68,9 +68,17 @@ func QueryDevicesWithLabels(qm models.QueryModel, tx context.Context, pCtx backe
 	values := []int64{}
 	devices := []string{}
 
+	var filter = "All"
+	if len(qm.PathFilter) > 0 {
+		filter = qm.PathFilter
+	}
 	for i := 1; i <= 10; i++ {
-		// add fields.
 		deviceName := fmt.Sprintf("device_%d", i)
+		// add fields.
+		if filter != "All" && !strings.Contains(filter, deviceName) {
+			continue
+		}
+
 		labels := make(map[string]string)
 		labels["device"] = deviceName
 		//times = append(times, query.TimeRange.From, query.TimeRange.To)
