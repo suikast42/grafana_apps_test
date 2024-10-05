@@ -247,18 +247,14 @@ func (d *Datasource) RunStream(ctx context.Context, req *backend.RunStreamReques
 			if degree >= 360 {
 				degree = 0
 			}
-			frames := framePerLabeledDataFrames(sinusoidalValue)
-			err := sender.SendFrame(frames, data.IncludeAll)
-
-			if err != nil {
-				log.DefaultLogger.Error("Failed to send frame", "error", err)
-			}
+			singleDataFrameWithLabeledFields(sinusoidalValue, sender)
+			//multiDataFramesWithLabeledFields(sinusoidalValue, sender)
 
 		}
 	}
 
 }
-func framePerLabeledDataFrames(sinusoidalValue float64) *data.Frame {
+func singleDataFrameWithLabeledFields(sinusoidalValue float64, sender *backend.StreamSender) {
 	frame := data.NewFrame("devices-stream")
 	for i := 1; i <= 10; i++ {
 		deviceName := fmt.Sprintf("device_%d", i)
@@ -272,13 +268,35 @@ func framePerLabeledDataFrames(sinusoidalValue float64) *data.Frame {
 			data.NewField("time", labels, []time.Time{time.Now()}),
 			data.NewField("devices", labels, []string{deviceName}),
 			data.NewField("value", labels, []float64{sinusoidalValue}))
-		//err := sender.SendFrame(frame, data.IncludeAll)
-		//
-		//if err != nil {
-		//	log.DefaultLogger.Error("Failed to send frame", "error", err)
-		//}
+		err := sender.SendFrame(frame, data.IncludeAll)
+
+		if err != nil {
+			log.DefaultLogger.Error("Failed to send frame", "error", err)
+		}
 	}
 
-	return frame
+}
+func multiDataFramesWithLabeledFields(sinusoidalValue float64, sender *backend.StreamSender) {
+	frame := data.NewFrame("devices-stream")
+	for i := 1; i <= 10; i++ {
+		deviceName := fmt.Sprintf("device_%d", i)
+		labels := make(map[string]string)
+		labels["device"] = deviceName
+		//times = append(times, query.TimeRange.From, query.TimeRange.To)
+		//values = append(values, 1*int64(i), 2*int64(i))
+		//devices = append(devices, deviceName, deviceName)
+		//frame := data.NewFrame(deviceName)
+
+		frame.Fields = append(frame.Fields,
+			data.NewField("time", labels, []time.Time{time.Now()}),
+			data.NewField("devices", labels, []string{deviceName}),
+			data.NewField("value", labels, []float64{sinusoidalValue}))
+		err := sender.SendFrame(frame, data.IncludeAll)
+
+		if err != nil {
+			log.DefaultLogger.Error("Failed to send frame", "error", err)
+		}
+
+	}
 
 }

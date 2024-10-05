@@ -43,6 +43,12 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     query(request: DataQueryRequest<MyQuery>): Observable<DataQueryResponse> {
         if (request.liveStreaming) {
             const observables = request.targets.map((query, index) => {
+                if (!query.pathFilter){
+                    console.log(`Call liveStreaming: ${query.queryText}`);
+                }else {
+                    console.log(`Call liveStreaming: ${query.queryText}/${query.pathFilter}`);
+                }
+
                 return getGrafanaLiveSrv().getDataStream({
                     addr: {
                         scope: LiveChannelScope.DataSource,
@@ -59,7 +65,12 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
         const response = super.query(request)
         response.forEach((value) => {
             // TODO: create an issue: errors is always undefined
-            console.info(`Call queryText: ${request.targets[0].queryText}. PathFilter: ${request.targets[0].pathFilter}`);
+            if (!request.targets[0].pathFilter){
+                console.log(`Query call queryText: ${request.targets[0].queryText}`);
+            }else {
+                console.log(`Query call queryText: ${request.targets[0].queryText}/${request.targets[0].pathFilter}`);
+            }
+
             if (value.error) {
                 console.error(`Error for call: ${request.targets[0].queryText}.  Error message is: ${value.error.message}`);
 
