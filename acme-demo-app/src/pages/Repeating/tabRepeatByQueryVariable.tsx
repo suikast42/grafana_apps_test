@@ -21,7 +21,6 @@ export const getTabRepeatByQueryVariable = () => {
         query:{
             refId: 'A',
             queryText: "devices",
-            constant: 2.1,
             refresh:VariableRefresh.onTimeRangeChanged,
         },
         allValue: "All",
@@ -38,7 +37,7 @@ export const getTabRepeatByQueryVariable = () => {
             {
                 refId: 'A',
                 queryText: "devices_per_label",
-                // pathFilter: '$devices',
+                pathFilter: '$devices',
                 constant: 4.2,
             },
         ],

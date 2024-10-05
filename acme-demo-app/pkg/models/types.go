@@ -13,5 +13,5 @@ type QueryModel struct {
 	QueryText     string  `json:"queryText"`
 	RefID         string  `json:"refId"`
 	Constant      float64 `json:"constant"`
-	PathFilter    float64 `json:"pathFilter"`
+	PathFilter    string  `json:"pathFilter"`
 }

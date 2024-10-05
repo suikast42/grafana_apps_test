@@ -25,14 +25,22 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     }
 
     applyTemplateVariables(query: MyQuery, scopedVars: ScopedVars) {
-        query.queryText = getTemplateSrv().replace(query.queryText, scopedVars)
-        return {
-            ...query,
-        };
+        // query.queryText = getTemplateSrv().replace(query.queryText, scopedVars)
+        // query.pathFilter = getTemplateSrv().replace(query.pathFilter, scopedVars)
+        // console.log(query.queryText);
         // return {
         //     ...query,
-        //     queryText: getTemplateSrv().replace(query.queryText, scopedVars),
         // };
+
+        var pathFilter = ""
+        if(!query.pathFilter){
+            pathFilter = getTemplateSrv().replace(query.pathFilter, scopedVars)
+        }
+        return {
+            ...query,
+            queryText: getTemplateSrv().replace(query.queryText, scopedVars),
+            pathFilter: pathFilter,
+        };
     }
 
     filterQuery(query: MyQuery): boolean {
@@ -53,7 +61,7 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
                     addr: {
                         scope: LiveChannelScope.DataSource,
                         namespace: this.uid,
-                        path: `${query.queryText}/${query.pathFilter}`, // this will allow each new query to create a new connection
+                        path: `${query.queryText}`, // this will allow each new query to create a new connection
                         data: {
                             ...query,
                         },
