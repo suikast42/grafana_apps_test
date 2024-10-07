@@ -31,7 +31,7 @@ export const getTabRepeatByQueryVariable = () => {
     })
     const dataQuery = new SceneQueryRunner({
         datasource: DATASOURCE_CUSTOMDS_REF,
-        liveStreaming: false,
+        liveStreaming: true,
         $timeRange: new SceneTimeRange({from: 'now-24h', to: 'now'}),
         queries: [
             {
