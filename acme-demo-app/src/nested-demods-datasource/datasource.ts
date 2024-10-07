@@ -48,17 +48,18 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     query(request: DataQueryRequest<MyQuery>): Observable<DataQueryResponse> {
         if (request.liveStreaming) {
             const observables = request.targets.map((query, index) => {
-                if (!query.pathFilter) {
-                    console.log(`Call liveStreaming: ${query.queryText}`);
-                } else {
-                    console.log(`Call liveStreaming: ${query.queryText} with pathFilter: ${query.pathFilter}`);
-                }
+                query.queryText = pathReplacer(getTemplateSrv().replace(query.queryText))
+                query.pathFilter = pathReplacer( getTemplateSrv().replace(query.pathFilter))
+                var path = query.queryText
 
+                if (query.pathFilter) {
+                    path = `${query.queryText}/${query.pathFilter}`;
+                }
                 return getGrafanaLiveSrv().getDataStream({
                     addr: {
                         scope: LiveChannelScope.DataSource,
                         namespace: this.uid,
-                        path: `${query.queryText}`, // this will allow each new query to create a new connection
+                        path: path, // this will allow each new query to create a new connection
                         data: {
                             ...query,
                         },
@@ -90,6 +91,13 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     }
 }
 
+// The grafana getGrafanaLiveSrv seems not like some characters like
+// {,},,
+// in the path. So we filter it out as a workaround here
+function pathReplacer(path: string) {
+    return path.replaceAll('{', '').replaceAll('}', '').replaceAll(',','');
+
+}
 // function stringToHash(value?: string  ) {
 //     return ""
 //     // if (!value) {

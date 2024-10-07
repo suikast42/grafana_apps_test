@@ -18,7 +18,6 @@ interface DeviceVizProps extends PanelProps<DeviceVizOptions> {
 function DeviceVizPanel(props: DeviceVizProps) {
     const {id, fieldConfig, data, options} = props;
     const dataFrame = data.series;
-
     if (options.devicename === undefined || options.devicename === '') {
         return <PanelDataErrorView panelId={id} fieldConfig={fieldConfig} data={data}
                                    message={"devicename is not supported in the options"}/>;

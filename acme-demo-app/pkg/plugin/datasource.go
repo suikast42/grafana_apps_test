@@ -245,22 +245,35 @@ func (d *Datasource) RunStream(ctx context.Context, req *backend.RunStreamReques
 			if degree >= 360 {
 				degree = 0
 			}
-			singleDataFrameWithLabeledFields(sinusoidalValue, sender, filter)
+			singleDataFrameWithLabeledFields(qm, sinusoidalValue, sender, filter)
 			//multiDataFramesWithLabeledFields(sinusoidalValue, sender)
 
 		}
 	}
 
 }
-func singleDataFrameWithLabeledFields(sinusoidalValue float64, sender *backend.StreamSender, filter string) {
+func allowedForDevice(deviceName string, filter string) bool {
+	const filterAll = "All"
+	if len(filter) == 0 {
+		return true
+	}
+
+	if strings.EqualFold(filterAll, filter) {
+		return true
+	}
+	if strings.Contains(filter, deviceName) {
+		return true
+	}
+	return false
+}
+func singleDataFrameWithLabeledFields(qm models.QueryModel, sinusoidalValue float64, sender *backend.StreamSender, filter string) {
 	frame := data.NewFrame("devices-stream")
 	for i := 1; i <= 10; i++ {
 		deviceName := fmt.Sprintf("device_%d", i)
-		//if len(filter) > 0 && (filter != "All" ||
-		//	!strings.Contains(filter, deviceName)) {
-		//	log.DefaultLogger.Debug(fmt.Sprintf("Filter out %s Filter: %s", deviceName, filter))
-		//	continue
-		//}
+		if !allowedForDevice(deviceName, qm.PathFilter) {
+			log.DefaultLogger.Debug(fmt.Sprintf("Filter out %s Filter: %s", deviceName, filter))
+			continue
+		}
 
 		labels := make(map[string]string)
 		labels["device"] = deviceName

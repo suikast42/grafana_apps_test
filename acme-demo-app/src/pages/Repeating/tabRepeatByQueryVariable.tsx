@@ -37,24 +37,13 @@ export const getTabRepeatByQueryVariable = () => {
             {
                 refId: 'A',
                 queryText: 'devices_per_label',
-                pathFilter: "${devices}",
+                pathFilter: '${devices}',
                 constant: 4.2,
             },
         ],
 
     })
 
-    // devicesVariable.addActivationHandler(() =>{
-    //     devicesVariable.subscribeToState(newState => {
-    //         console.log(newState)
-    //         // dataQuery.setState( {
-    //         //     queries: [
-    //         //         ...newState,
-    //         //     ]
-    //         // })
-    //     });
-    //     dataQuery.runQueries()
-    // });
     const body = new SceneByVariableRepeater({
         variableName: 'devices',
         body: new SceneFlexLayout({
@@ -74,6 +63,8 @@ export const getTabRepeatByQueryVariable = () => {
             ],
         }),
     })
+
+
     return new EmbeddedScene({
         $timeRange: timeRange,
         $variables: new SceneVariableSet({
