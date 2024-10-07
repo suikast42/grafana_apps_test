@@ -190,6 +190,7 @@ func (d *Datasource) RunStream(ctx context.Context, req *backend.RunStreamReques
 
 	err := json.Unmarshal(req.Data, &qm)
 	if err != nil {
+		log.DefaultLogger.Debug("DemoDs RunStream error", err)
 		return err
 	}
 	log.DefaultLogger.Debug("DemoDs RunStream", qm.String())
@@ -255,10 +256,11 @@ func singleDataFrameWithLabeledFields(sinusoidalValue float64, sender *backend.S
 	frame := data.NewFrame("devices-stream")
 	for i := 1; i <= 10; i++ {
 		deviceName := fmt.Sprintf("device_%d", i)
-		if filter != "All" && !strings.Contains(filter, deviceName) {
-			log.DefaultLogger.Debug("Filter out ", deviceName)
-			continue
-		}
+		//if len(filter) > 0 && (filter != "All" ||
+		//	!strings.Contains(filter, deviceName)) {
+		//	log.DefaultLogger.Debug(fmt.Sprintf("Filter out %s Filter: %s", deviceName, filter))
+		//	continue
+		//}
 
 		labels := make(map[string]string)
 		labels["device"] = deviceName
@@ -269,7 +271,7 @@ func singleDataFrameWithLabeledFields(sinusoidalValue float64, sender *backend.S
 		frame.Fields = append(frame.Fields,
 			data.NewField("time", labels, []time.Time{time.Now()}),
 			data.NewField("devices", labels, []string{deviceName}),
-			data.NewField("value", labels, []float64{sinusoidalValue}))
+			data.NewField("values", labels, []float64{sinusoidalValue}))
 		err := sender.SendFrame(frame, data.IncludeAll)
 
 		if err != nil {
@@ -279,7 +281,7 @@ func singleDataFrameWithLabeledFields(sinusoidalValue float64, sender *backend.S
 
 }
 func multiDataFramesWithLabeledFields(sinusoidalValue float64, sender *backend.StreamSender, filter string) {
-	frame := data.NewFrame("devices-stream")
+
 	for i := 1; i <= 10; i++ {
 		deviceName := fmt.Sprintf("device_%d", i)
 
@@ -292,7 +294,7 @@ func multiDataFramesWithLabeledFields(sinusoidalValue float64, sender *backend.S
 		//values = append(values, 1*int64(i), 2*int64(i))
 		//devices = append(devices, deviceName, deviceName)
 		//frame := data.NewFrame(deviceName)
-
+		frame := data.NewFrame(deviceName)
 		frame.Fields = append(frame.Fields,
 			data.NewField("time", labels, []time.Time{time.Now()}),
 			data.NewField("devices", labels, []string{deviceName}),

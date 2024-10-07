@@ -25,18 +25,19 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     }
 
     applyTemplateVariables(query: MyQuery, scopedVars: ScopedVars) {
-        // query.queryText = getTemplateSrv().replace(query.queryText, scopedVars)
-        // query.pathFilter = getTemplateSrv().replace(query.pathFilter, scopedVars)
-        // console.log(query.queryText);
-        // return {
-        //     ...query,
-        // };
-
+        query.queryText = getTemplateSrv().replace(query.queryText, scopedVars)
+        query.pathFilter = getTemplateSrv().replace(query.pathFilter, scopedVars)
+        // console.log(getTemplateSrv().replace(query.queryText, scopedVars));
+        // console.log( getTemplateSrv().replace(query.pathFilter, scopedVars));
         return {
             ...query,
-            queryText: getTemplateSrv().replace(query.queryText, scopedVars),
-            pathFilter:  getTemplateSrv().replace(query.pathFilter, scopedVars),
         };
+
+        // return {
+        //     ...query,
+        //     queryText: getTemplateSrv().replace(query.queryText, scopedVars),
+        //     pathFilter: getTemplateSrv().replace(query.pathFilter, scopedVars),
+        // };
     }
 
     filterQuery(query: MyQuery): boolean {
@@ -47,9 +48,9 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     query(request: DataQueryRequest<MyQuery>): Observable<DataQueryResponse> {
         if (request.liveStreaming) {
             const observables = request.targets.map((query, index) => {
-                if (!query.pathFilter){
+                if (!query.pathFilter) {
                     console.log(`Call liveStreaming: ${query.queryText}`);
-                }else {
+                } else {
                     console.log(`Call liveStreaming: ${query.queryText} with pathFilter: ${query.pathFilter}`);
                 }
 
@@ -57,7 +58,7 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
                     addr: {
                         scope: LiveChannelScope.DataSource,
                         namespace: this.uid,
-                        path: `${query.queryText}/${query.pathFilter}`, // this will allow each new query to create a new connection
+                        path: `${query.queryText}`, // this will allow each new query to create a new connection
                         data: {
                             ...query,
                         },
@@ -69,15 +70,14 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
         const response = super.query(request)
         response.forEach((value) => {
             // TODO: create an issue: errors is always undefined
-            if (!request.targets[0].pathFilter){
+            if (!request.targets[0].pathFilter) {
                 console.log(`Query call queryText: ${request.targets[0].queryText}`);
-            }else {
+            } else {
                 console.log(`Query call queryText: ${request.targets[0].queryText}/${request.targets[0].pathFilter}`);
             }
 
             if (value.error) {
                 console.error(`Error for call: ${request.targets[0].queryText}.  Error message is: ${value.error.message}`);
-
             }
 
 
@@ -89,3 +89,13 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
         return response
     }
 }
+
+// function stringToHash(value?: string  ) {
+//     return ""
+//     // if (!value) {
+//     //     value = "All"
+//     // }
+//     // return value.split('').reduce((hash, char) => {
+//     //     return char.charCodeAt(0) + (hash << 6) + (hash << 16) - hash;
+//     // }, 0);
+// }

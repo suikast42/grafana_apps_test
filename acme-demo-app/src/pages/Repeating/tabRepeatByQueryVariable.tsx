@@ -18,10 +18,10 @@ export const getTabRepeatByQueryVariable = () => {
     const devicesVariable = new QueryVariable({
         name: 'devices',
         datasource: DATASOURCE_CUSTOMDS_REF,
-        query:{
+        query: {
             refId: 'A',
             queryText: "devices",
-            refresh:VariableRefresh.onTimeRangeChanged,
+            refresh: VariableRefresh.onTimeRangeChanged,
         },
         allValue: "All",
         isMulti: true,
@@ -36,21 +36,33 @@ export const getTabRepeatByQueryVariable = () => {
         queries: [
             {
                 refId: 'A',
-                queryText: "devices_per_label",
-                pathFilter: '${devices}',
+                queryText: 'devices_per_label',
+                pathFilter: "${devices}",
                 constant: 4.2,
             },
         ],
 
     })
-    const body=  new SceneByVariableRepeater({
+
+    // devicesVariable.addActivationHandler(() =>{
+    //     devicesVariable.subscribeToState(newState => {
+    //         console.log(newState)
+    //         // dataQuery.setState( {
+    //         //     queries: [
+    //         //         ...newState,
+    //         //     ]
+    //         // })
+    //     });
+    //     dataQuery.runQueries()
+    // });
+    const body = new SceneByVariableRepeater({
         variableName: 'devices',
         body: new SceneFlexLayout({
             children: [],
         }),
         getLayoutChild: (option) => new SceneFlexLayout({
-            minWidth:400,
-            maxHeight:400,
+            minWidth: 400,
+            maxHeight: 400,
             children: [
                 // new SceneFlexItem({
                 //     body: PanelBuilders.timeseries()
@@ -72,7 +84,7 @@ export const getTabRepeatByQueryVariable = () => {
         controls: [
             new VariableValueSelectors({}),
             new SceneControlsSpacer(),
-            new SceneTimePicker({ isOnCanvas: true }),
+            new SceneTimePicker({isOnCanvas: true}),
             new SceneRefreshPicker({
                 intervals: ['5s', '1m', '1h'],
                 isOnCanvas: true,
