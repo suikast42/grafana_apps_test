@@ -271,7 +271,7 @@ func singleDataFrameWithLabeledFields(qm models.QueryModel, sinusoidalValue floa
 	for i := 1; i <= 10; i++ {
 		deviceName := fmt.Sprintf("device_%d", i)
 		if !allowedForDevice(deviceName, qm.PathFilter) {
-			log.DefaultLogger.Debug(fmt.Sprintf("Filter out %s Filter: %s", deviceName, filter))
+			//log.DefaultLogger.Debug(fmt.Sprintf("Filter out %s Filter: %s", deviceName, filter))
 			continue
 		}
 

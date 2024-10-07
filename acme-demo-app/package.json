@@ -54,7 +54,8 @@
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4",
     "webpack-livereload-plugin": "^3.0.2",
-    "webpack-virtual-modules": "^0.6.2"
+    "webpack-virtual-modules": "^0.6.2",
+    "webpack-subresource-integrity": "^5.1.0"
   },
   "engines": {
     "node": ">=20"
@@ -65,7 +66,7 @@
     "@grafana/runtime": "^11.2.2",
     "@grafana/ui": "^11.2.2",
     "@grafana/schema": "^10.4.0",
-    "@grafana/scenes": "^5.16.3",
+    "@grafana/scenes": "^5.18.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-router-dom": "^5.2.0",
