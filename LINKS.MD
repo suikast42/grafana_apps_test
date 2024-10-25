@@ -22,3 +22,6 @@
 ## Repos with examples 
 
 [AWS Sitewise datasource](https://github.com/grafana/iot-sitewise-datasource/blob/main/src/SitewiseDataSource.ts)
+[AWS Sitewise datasource](https://github.com/grafana/iot-sitewise-datasource/blob/main/src/SitewiseDataSource.ts)
+
+[Dashboard in App plugin with CSS injection](https://github.com/cwkwan/grafana-scenes-objects/blob/main/examples/app-plugin-iframe-dashboard-css-injection/Page.tsx)

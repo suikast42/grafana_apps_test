@@ -53,7 +53,7 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
                 var path = query.queryText
 
                 if (query.pathFilter) {
-                    path = `${query.queryText}/${query.pathFilter}`;
+                    path = `${path}/${query.pathFilter}`;
                 }
                 console.log(`Query call liveStreaming: ${path}`);
                 return getGrafanaLiveSrv().getDataStream({
