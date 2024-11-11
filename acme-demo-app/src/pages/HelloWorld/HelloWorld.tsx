@@ -10,13 +10,13 @@ import {ROUTES} from "../../constants";
 import {getHelloWorldScene} from "./helloWorldScene";
 
 const HelloWorld = () => {
-    const scene = useSceneApp(getScene);
+    const scene = useSceneApp(getSceneHelloWorld);
     return <scene.Component model={scene}/>;
 };
 
 export default HelloWorld;
 
-const getScene = () =>
+export const getSceneHelloWorld = () =>
     new SceneApp({
         pages: [
             new SceneAppPage({
